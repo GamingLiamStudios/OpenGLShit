@@ -6,8 +6,8 @@
 
 #include "shaders.h"
 
-#define GLV_MAJOR 4
-#define GLV_MINOR 6
+#define GLV_MAJOR 3
+#define GLV_MINOR 3
 
 #define SCR_WIDTH  800
 #define SCR_HEIGHT 600
@@ -49,15 +49,39 @@ int main(int argv, char **argc)
 
     printf("Hello World!\n");
 
-    printf("%s\n", fragment_shader);
-    printf("%s\n", vertex_shader);
+    float vertices[] = { -0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f };
+
+    u32 vao, vbo;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+
+    // Use shader
+    u32 program;
+    program = compile_program(vertex_shader_source, fragment_shader_source);
+    if (program == -1)
+    {
+        printf("Failed to compile program\n");
+        glfwTerminate();
+        return -1;
+    }
 
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
-        // Render
+        // Clear screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render
+        glUseProgram(program);
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // Poll and handle events
         glfwPollEvents();

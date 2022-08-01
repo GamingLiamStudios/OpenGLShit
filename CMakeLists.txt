@@ -18,6 +18,7 @@ set(SOURCE_FILES
     extern/glad/glad.c
 
     source/main.c
+    source/shaders/shaders.c
 )
 
 add_executable(main-executable ${SOURCE_FILES})
