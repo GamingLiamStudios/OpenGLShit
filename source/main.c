@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "shaders.h"
+
 #define GLV_MAJOR 4
 #define GLV_MINOR 6
 
@@ -46,6 +48,9 @@ int main(int argv, char **argc)
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     printf("Hello World!\n");
+
+    printf("%s\n", fragment_shader);
+    printf("%s\n", vertex_shader);
 
     // Main loop
     while (!glfwWindowShouldClose(window))

@@ -29,3 +29,23 @@ target_include_directories(main-executable PUBLIC "extern")
 target_include_directories(main-executable PUBLIC "source") # to allow paths relative to project root
 
 target_link_libraries(main-executable PRIVATE m zlib OpenGL::GL glfw)
+
+# Generate static includes for shaders
+file(GLOB SHADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/source/shaders/*.glsl)
+
+foreach(SHADER_FILE ${SHADER_FILES})
+    get_filename_component(SHADER_NAME ${SHADER_FILE} NAME_WE)
+    set(CSHADER_NAME "generated/${SHADER_NAME}.c")
+    list(APPEND SHADER_EXPORTS ${CSHADER_NAME})
+
+    add_custom_command(OUTPUT ${CSHADER_NAME}
+        COMMAND ${CMAKE_COMMAND} -DSHADER_FILE:STRING=${SHADER_FILE} -DCSHADER_NAME:STRING=${CSHADER_NAME} -DSHADER_NAME:STRING=${SHADER_NAME}
+        -P ${CMAKE_MODULE_PATH}/generate_shaders.cmake
+        DEPENDS ${SHADER_FILE}
+        DEPENDS ${CMAKE_MODULE_PATH}/generate_shaders.cmake
+        COMMENT "Generating shader ${SHADER_FILE}"
+    )
+endforeach()
+
+set_source_files_properties(${SHADER_EXPORTS} PROPERTIES GENERATED TRUE)
+target_sources(${PROJECT_NAME} PRIVATE ${SHADER_EXPORTS})
